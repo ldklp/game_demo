@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForestTable · 克苏鲁森林逃生</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ================= 标题：选一个角色 ================= -->
+<section id="screenTitle" class="screen">
+  <div class="titlewrap">
+    <div class="tkicker">单人 · 回合制生存 · 全判定 d6</div>
+    <h1>Forest<span>Table</span></h1>
+    <p class="tsub">你一个人走进了这片森林。<br>健康、体力、精神都只剩十几点，<br>每一次判定只有一个六面骰，每一节拍都要和它抢出手权。</p>
+
+    <div class="setup">
+      <div class="suhead"><span>选一个角色</span><span class="hint">点击卡片选择</span></div>
+      <div id="roster" class="charcards"></div>
+      <div class="namerow">
+        <label>名字</label>
+        <input id="playerName" maxlength="8" value="旅人">
+        <button id="startBtn" class="primary big">进入森林</button>
+        <button id="continueBtn" class="ghost big hidden">继续存档</button>
+      </div>
+    </div>
+
+    <div class="tnote">
+      原型 v2.0 · 4 阶段可通关 · 属性 15~25 · 伤害 2~4 · 全部判定 1d6<br>
+      战斗：每节拍双方各投 d6 抢行动权，连击 -1（至对方行动为止）
+    </div>
+  </div>
+</section>
+
+<!-- ================= 游戏主界面 ================= -->
+<section id="screenGame" class="screen hidden">
+  <header id="topbar"></header>
+  <div class="board">
+    <aside class="left">
+      <div id="playersCol"></div>
+      <div class="panel" id="invPanel"></div>
+    </aside>
+    <main class="center">
+      <div id="sceneBox"></div>
+      <div id="stageBox"></div>
+    </main>
+    <aside class="side">
+      <div class="panel" id="craftPanel"></div>
+      <div id="previewBox"></div>
+      <div class="panel" id="logPanel"></div>
+    </aside>
+  </div>
+</section>
+
+<div id="modalLayer"></div>
+<div id="toastLayer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () { FT.UI.init(); });
+</script>
+</body>
+</html>

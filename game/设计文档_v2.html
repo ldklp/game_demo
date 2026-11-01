@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForestTable · 数值与战斗设计书 v2.0</title>
+<style>
+  :root{
+    --paper:#f7f5ef; --paper2:#fffdf8; --ink:#22271f; --ink2:#4a5245; --ink3:#7d8479;
+    --line:#ded9cc; --line2:#cbc5b5;
+    --green:#2f4a37; --green2:#4d7059; --moss:#7d9457;
+    --brass:#9a7418; --brass-bg:#f4ecd8;
+    --red:#a8412a; --red-bg:#f8ece8;
+    --blue:#3d5f7a;
+    --mono:Consolas,"SFMono-Regular",Menlo,monospace;
+    --serif:Georgia,"Songti SC","SimSun",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:14.5px;line-height:1.85;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 30px 90px}
+
+  /* ---------- 封面 ---------- */
+  header{
+    padding:64px 0 40px;border-bottom:1px solid var(--line2);margin-bottom:44px;
+    background:linear-gradient(180deg,#eef0e6,transparent);
+  }
+  .kicker{font-size:11px;letter-spacing:.34em;color:var(--green2);text-transform:uppercase;margin-bottom:14px}
+  h1{font-family:var(--serif);font-size:42px;line-height:1.18;margin:0 0 6px;letter-spacing:.01em;color:var(--green);font-weight:600}
+  h1 em{font-style:normal;color:var(--brass)}
+  .sub{font-family:var(--serif);font-size:16px;color:var(--ink2);margin:0 0 26px}
+  .metas{display:flex;flex-wrap:wrap;gap:8px}
+  .meta{font-size:11.5px;padding:3px 11px;border:1px solid var(--line2);border-radius:20px;color:var(--ink3);background:var(--paper2)}
+  .meta b{color:var(--ink);font-weight:600}
+
+  /* ---------- 结构 ---------- */
+  h2{
+    font-family:var(--serif);font-size:24px;color:var(--green);margin:58px 0 4px;font-weight:600;
+    padding-bottom:10px;border-bottom:1px solid var(--line);letter-spacing:.01em;
+  }
+  h2 .no{color:var(--brass);font-size:15px;margin-right:10px;font-family:var(--mono)}
+  h3{font-size:15px;margin:30px 0 8px;color:var(--ink);font-weight:600;letter-spacing:.02em}
+  h3::before{content:"";display:inline-block;width:5px;height:5px;background:var(--moss);border-radius:50%;margin-right:9px;vertical-align:3px}
+  h4{font-size:13px;margin:20px 0 6px;color:var(--ink2);font-weight:600}
+  p{margin:9px 0;color:var(--ink2)}
+  p.lead{font-size:15px;color:var(--ink)}
+  strong{color:var(--ink);font-weight:600}
+  code{font-family:var(--mono);font-size:12.5px;background:#edeade;padding:1px 5px;border-radius:4px;color:var(--green)}
+
+  /* ---------- 表格 ---------- */
+  table{width:100%;border-collapse:collapse;margin:14px 0 6px;font-size:13px;background:var(--paper2);border:1px solid var(--line)}
+  caption{caption-side:top;text-align:left;font-size:11px;letter-spacing:.16em;color:var(--ink3);text-transform:uppercase;padding-bottom:7px}
+  th{background:#eceae0;text-align:left;font-weight:600;font-size:11.5px;letter-spacing:.06em;color:var(--ink2);padding:8px 11px;border-bottom:1px solid var(--line2);white-space:nowrap}
+  td{padding:8px 11px;border-bottom:1px solid #eeeae0;color:var(--ink2);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td b,th b{color:var(--ink)}
+  .num{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+  .c{text-align:center}
+  tr.hi td{background:#f3f1e4}
+  .dim{color:var(--ink3)}
+
+  /* ---------- 卡片/强调块 ---------- */
+  .box{border:1px solid var(--line);border-left:3px solid var(--moss);background:var(--paper2);padding:14px 18px;margin:16px 0;border-radius:0 6px 6px 0}
+  .box .bt{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--moss);margin-bottom:5px}
+  .box p{margin:4px 0}
+  .box.warn{border-left-color:var(--red);background:var(--red-bg)}
+  .box.warn .bt{color:var(--red)}
+  .box.brass{border-left-color:var(--brass);background:var(--brass-bg)}
+  .box.brass .bt{color:var(--brass)}
+
+  .formula{
+    font-family:var(--mono);font-size:13.5px;background:var(--green);color:#e8efd9;
+    padding:13px 18px;border-radius:7px;margin:14px 0;line-height:2;
+  }
+  .formula i{color:#c8d6a8;font-style:normal}
+  .formula b{color:#fff;font-weight:600}
+
+  /* 字段网格 */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
+  .gitem{border:1px solid var(--line);background:var(--paper2);padding:12px 15px;border-radius:6px}
+  .gitem .gt{font-size:11px;letter-spacing:.14em;color:var(--brass);text-transform:uppercase;margin-bottom:3px}
+  .gitem .gv{font-family:var(--serif);font-size:19px;color:var(--green)}
+  .gitem .gd{font-size:12px;color:var(--ink3);margin-top:2px}
+
+  /* 概率条 */
+  .pbar{display:inline-block;width:70px;height:7px;background:#e6e2d6;border-radius:4px;overflow:hidden;vertical-align:1px;margin-right:7px}
+  .pbar i{display:block;height:100%;background:var(--moss);border-radius:4px}
+  .pbar i.low{background:var(--brass)}
+  .pbar i.vlow{background:var(--red)}
+
+  /* 战斗实录 */
+  .log{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:16px 0;background:var(--paper2)}
+  .log .lrow{display:grid;grid-template-columns:78px 1fr;border-bottom:1px solid #eeeae0}
+  .log .lrow:last-child{border-bottom:none}
+  .log .lno{background:#eceae0;padding:9px 11px;font-family:var(--mono);font-size:11.5px;color:var(--ink3);display:flex;align-items:center}
+  .log .lctx{padding:9px 14px;font-size:13px;color:var(--ink2)}
+  .log .lctx b{color:var(--ink)}
+  .log .dice{font-family:var(--mono);font-size:12px;background:#eef0e4;border:1px solid #dcdfc9;border-radius:4px;padding:0 5px;color:var(--green);white-space:nowrap}
+  .log .dmg{font-family:var(--mono);color:var(--red);font-weight:600}
+  .log .crit{font-family:var(--mono);color:var(--brass);font-weight:600}
+  .log .prow{background:#f7f6ec}
+  .log .erow{background:#faf4f1}
+
+  ul,ol{margin:10px 0 10px 0;padding-left:22px;color:var(--ink2)}
+  li{margin:5px 0}
+  li::marker{color:var(--moss)}
+
+  .foot{margin-top:70px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  @media print{
+    body{background:#fff}
+    header{background:none}
+    h2{page-break-after:avoid}
+    table,.box,.log{page-break-inside:avoid}
+  }
+  @media (max-width:720px){
+    .wrap{padding:0 18px 60px}
+    h1{font-size:30px}
+    .grid{grid-template-columns:1fr}
+    .log .lrow{grid-template-columns:60px 1fr}
+    table{font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">ForestTable · System Design</div>
+  <h1>数值与战斗设计书 <em>v2.0</em></h1>
+  <p class="sub">单骰 d6 · 属性 15~25 · 伤害成为第四项属性 · 战斗改为「抢行动权」</p>
+  <div class="metas">
+    <span class="meta">版本 <b>2.0</b></span>
+    <span class="meta">判定 <b>1d6 + 修正 ≥ 难度</b></span>
+    <span class="meta">属性 <b>健康 / 体力 / 精神 / 伤害</b></span>
+    <span class="meta">可玩原型 <b>web/index.html</b></span>
+  </div>
+</header>
+
+<p class="lead">
+这一版把整套数值推倒重来。上一版是 0~100 属性 + d20 判定，战斗是「双方各打一轮」——
+问题是数字太大，玩家永远记不住自己离死亡有多远，d20 的 ±1 修正也几乎没有手感。
+v2 把一切压进 <strong>1~6 的骰面</strong>：属性只剩 15~25 点，一次判定只投一颗骰子，
+每一次「+1」都是肉眼可见的 17%。战斗也不再轮流，而是每节拍双方各投一颗骰子抢出手权。
+</p>
+
+<h2><span class="no">01</span>这一版改了什么</h2>
+
+<table>
+  <caption>v1 → v2 对照</caption>
+  <thead><tr><th style="width:16%">项目</th><th style="width:32%">v1</th><th>v2</th></tr></thead>
+  <tbody>
+    <tr><td><b>属性尺度</b></td><td>健康/体力/精神 0~100</td><td><b>15~25</b>，四项属性，一眼能数清自己还能挨几下</td></tr>
+    <tr><td><b>伤害</b></td><td>只有武器骰，角色没有攻击力</td><td><b>新增「伤害」属性（2~4）</b>，工具与携带道具可叠加</td></tr>
+    <tr><td><b>判定骰</b></td><td>d20 + 修正 vs 8/12/16/20</td><td><b>1d6 + 修正 vs 3/4/5/6</b>，全局只有这一颗骰子</td></tr>
+    <tr><td><b>战斗节奏</b></td><td>每轮：玩家打一遍 → 敌人打一次</td><td><b>每节拍双方各投 d6 抢行动权</b>，抢到的人才能动</td></tr>
+    <tr><td><b>连击</b></td><td>无</td><td>同一方连续行动 → <b>本次判定 -1</b>，持续到对方行动为止</td></tr>
+    <tr><td><b>暴击</b></td><td>自然 20</td><td><b>每把武器有自己的暴击骰面</b>：猎枪投出 4 就是双倍</td></tr>
+    <tr><td><b>敌人</b></td><td>固定血量</td><td><b>四阶段血量表</b>，越深越硬；精英 42~72</td></tr>
+    <tr><td><b>死亡</b></td><td>健康归零 / 精神归零直接退场</td><td>都给 <b>3 回合宽限</b>（濒死 / 崩溃），可自救</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">02</span>四项属性</h2>
+
+<p>所有角色的初始属性都落在 <strong>15~25</strong> 这个窄带里。窄带的好处是：任何 1 点损失都疼，
+任何 1 点加成都能被感知。属性不是靠"练"上去的，只会往下掉。</p>
+
+<table>
+  <caption>属性定义</caption>
+  <thead><tr><th style="width:12%">属性</th><th style="width:11%">范围</th><th style="width:40%">含义</th><th>归零后果</th></tr></thead>
+  <tbody>
+    <tr><td><b>健康</b></td><td class="num">15~25</td><td>肉体完整度。挨打、坠落、发烧都从这里扣。</td><td><b>濒死</b>：无法行动，3 回合内没包扎就死</td></tr>
+    <tr><td><b>体力</b></td><td class="num">15~25</td><td>还能走多远。前进、收集、战斗僵持都消耗它。</td><td><b>力竭</b>：判定 -2，每回合健康 -1</td></tr>
+    <tr><td><b>精神</b></td><td class="num">15~25</td><td>还能不能相信自己的眼睛。</td><td><b>崩溃</b>：判定 -2，3 回合内没缓过来就退场</td></tr>
+    <tr class="hi"><td><b>伤害</b></td><td class="num">2~4</td><td>空手一拳有多重。<b>武器和道具都在这上面加。</b></td><td>—（不会归零，最低 1）</td></tr>
+  </tbody>
+</table>
+
+<h3>属性 → 修正</h3>
+
+<p>判定不用属性原值，用一张固定的修正表。这张表是全游戏唯一的换算口径，
+界面、引擎、文档都引用它，不存在第二套算法。</p>
+
+<table>
+  <caption>属性修正表</caption>
+  <thead><tr><th>属性值</th><th class="c">1~4</th><th class="c">5~9</th><th class="c">10~15</th><th class="c">16~19</th><th class="c">20~23</th><th class="c">24~25</th></tr></thead>
+  <tbody><tr><td><b>修正</b></td>
+    <td class="c num">-2</td><td class="c num">-1</td><td class="c num">0</td>
+    <td class="c num">+1</td><td class="c num">+2</td><td class="c num">+3</td></tr></tbody>
+</table>
+
+<div class="box">
+  <div class="bt">为什么初始值只给到 +1 ~ +3</div>
+  <p>开局就 +3 的角色（使徒 精神 25）在精神判定上是 83% 起步，这让他"敢去看不该看的东西"；
+  而健康 16 的使徒挨两下就掉到 0 修正。<b>数值本身就是角色的性格。</b></p>
+</div>
+
+<h3>四个角色的初始面板</h3>
+
+<table>
+  <caption>角色初始值与初始武器</caption>
+  <thead><tr><th style="width:13%">角色</th><th class="c">健康</th><th class="c">体力</th><th class="c">精神</th><th class="c">伤害</th><th>初始武器</th><th>被动</th></tr></thead>
+  <tbody>
+    <tr class="hi"><td><b>猎人</b></td><td class="c num">20</td><td class="c num">21</td><td class="c num">17</td><td class="c num">3</td>
+      <td>猎枪（伤害 +3 · 暴击 4 · 命中 +1）</td><td>首击 +1 命中；前进额外 +1 进度</td></tr>
+    <tr><td><b>脚夫</b></td><td class="c num">24</td><td class="c num">22</td><td class="c num">18</td><td class="c num">2</td>
+      <td>木棍（伤害 +1 · 暴击 6）</td><td>背包 +4 格</td></tr>
+    <tr><td><b>卫生员</b></td><td class="c num">18</td><td class="c num">19</td><td class="c num">23</td><td class="c num">2</td>
+      <td>空手</td><td>治疗 +2；用绷带/药不占行动</td></tr>
+    <tr><td><b>使徒</b></td><td class="c num">16</td><td class="c num">17</td><td class="c num">25</td><td class="c num">3</td>
+      <td>匕首（伤害 +2 · 暴击 5）</td><td>精神 ≤8 时全判定 +1；精神 ≥20 每回合 -1</td></tr>
+  </tbody>
+</table>
+
+<p class="dim">四个人的总点数分别是 61 / 64 / 62 / 61，差距在 ±3 以内。角色差异不来自总强度，来自"哪一项在 20 以上"。</p>
+
+<h2><span class="no">03</span>判定：全游戏只有一颗骰子</h2>
+
+<div class="formula">
+  <b>判定 = 1d6 + 属性修正 + 状态/装备修正 ≥ 难度</b><br>
+  <i>自然 6 = 大成功（判定必成功，并额外回复 1 点对应属性）</i><br>
+  <i>自然 1 = 大失败（判定必失败，无论修正多高）</i>
+</div>
+
+<table>
+  <caption>难度四档</caption>
+  <thead><tr><th class="c" style="width:14%">难度</th><th class="c" style="width:10%">值</th><th>用在哪</th><th class="c" style="width:18%">属性 16 的人</th><th class="c" style="width:18%">属性 22 的人</th></tr></thead>
+  <tbody>
+    <tr><td class="c"><b>轻松</b></td><td class="c num">3</td><td>顺手的事：捡柴、摘果、躲一场小雨</td>
+      <td class="c num">67%</td><td class="c num">83%</td></tr>
+    <tr class="hi"><td class="c"><b>普通</b></td><td class="c num">4</td><td>大部分意外与战斗闪避</td>
+      <td class="c num">50%</td><td class="c num">83%</td></tr>
+    <tr><td class="c"><b>困难</b></td><td class="c num">5</td><td>精神冲击、沼泽、落石</td>
+      <td class="c num">33%</td><td class="c num">67%</td></tr>
+    <tr><td class="c"><b>极难</b></td><td class="c num">6</td><td>直面不该看的东西</td>
+      <td class="c num">17%</td><td class="c num">50%</td></tr>
+  </tbody>
+</table>
+
+<div class="box brass">
+  <div class="bt">一个必须说清楚的性质</div>
+  <p>因为「自然 1 必失败」，<b>d6 的成功率上限是 83%（5/6）</b>，永远不会到 100%。
+  所以再强的角色也总有 17% 的机会搞砸——这是刻意留的：它保证了克苏鲁题材里那种"你永远不该完全放心"的手感。</p>
+</div>
+
+<h3>成功率矩阵</h3>
+
+<table>
+  <caption>P(成功)，行 = 修正，列 = 难度</caption>
+  <thead><tr><th>修正</th><th class="c">难度 3</th><th class="c">难度 4</th><th class="c">难度 5</th><th class="c">难度 6</th></tr></thead>
+  <tbody>
+    <tr><td class="num">-2</td><td class="c num">33%</td><td class="c num">17%</td><td class="c num">17%</td><td class="c num">17%</td></tr>
+    <tr><td class="num">-1</td><td class="c num">50%</td><td class="c num">33%</td><td class="c num">17%</td><td class="c num">17%</td></tr>
+    <tr><td class="num">0</td><td class="c num">67%</td><td class="c num">50%</td><td class="c num">33%</td><td class="c num">17%</td></tr>
+    <tr class="hi"><td class="num">+1</td><td class="c num">83%</td><td class="c num">67%</td><td class="c num">50%</td><td class="c num">33%</td></tr>
+    <tr class="hi"><td class="num">+2</td><td class="c num">83%</td><td class="c num">83%</td><td class="c num">67%</td><td class="c num">50%</td></tr>
+    <tr><td class="num">+3</td><td class="c num">83%</td><td class="c num">83%</td><td class="c num">83%</td><td class="c num">67%</td></tr>
+  </tbody>
+</table>
+
+<p class="dim">注：自然 1 必失败，所以 -2 修正在难度 4/5/6 上都是 17%（只有投出 6 才行）。这是把"状态差"变成"几乎做不成事"的最短路径。</p>
+
+<h3>修正来源清单</h3>
+
+<table>
+  <caption>一次判定可能叠加的所有修正</caption>
+  <thead><tr><th style="width:26%">来源</th><th class="c" style="width:12%">修正</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td>对应属性</td><td class="c num">-2 ~ +3</td><td>查属性修正表</td></tr>
+    <tr><td>场景</td><td class="c num">0 ~ -1</td><td>阴森树林 / 沼泽 / 悬崖 -1</td></tr>
+    <tr><td>夜晚且无光</td><td class="c num">-1</td><td>火把或篝火可抵消</td></tr>
+    <tr><td>奇怪的石头</td><td class="c num">+1</td><td>携带即生效，占背包一格</td></tr>
+    <tr><td>使徒低语</td><td class="c num">+1</td><td>精神 ≤8 时</td></tr>
+    <tr><td>中毒 / 饥饿 / 幻觉</td><td class="c num">-1</td><td>逐个叠加</td></tr>
+    <tr><td>崩溃</td><td class="c num">-2</td><td>精神归零后</td></tr>
+    <tr><td>力竭</td><td class="c num">-2</td><td>体力归零后</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">04</span>战斗：每节拍抢一次出手权</h2>
+
+<p class="lead">v2 的战斗不再有"轮"。只有一个个<b>节拍</b>——每个节拍双方各投一颗 d6，
+点数高的人获得这一节拍的<b>行动权</b>，输的人这一节拍只能干看着。</p>
+
+<h3>4.1 一个节拍的完整流程</h3>
+
+<div class="formula">
+  ① <b>抢行动权</b>　你 1d6 + 速度修正 + 连击惩罚 &nbsp;vs&nbsp; 敌人 1d6 + 速度修正 + 连击惩罚<br>
+  <i>点数高者行动；平手时玩家优先（避免僵局）</i><br><br>
+  ② <b>行动</b>　　　抢到的一方从四个动作里选一个：攻击 / 防守 / 用道具 / 撤退<br>
+  <i>没抢到的一方本回合不能动，只是站着挨打</i><br><br>
+  ③ <b>连击结算</b>　连续行动的一方，下次抢行动权要 -1（见 4.2）
+</div>
+
+<h3>4.2 连击惩罚：这条规则是整个战斗的心脏</h3>
+
+<p>如果只是"抢到就一直打"，战斗会变成单方面碾压。所以：</p>
+
+<div class="box">
+  <div class="bt">规则原文</div>
+  <p><b>若一方连续行动，则该方本次投出的点数判定 -1，效果持续到对方行动为止。</b></p>
+  <p class="dim">实现上：该方这一节拍的抢行动权、命中判定、伤害骰面之外的修正全部 -1；连续第三次起 -2（上限），对方行动一次后清零。</p>
+</div>
+
+<table>
+  <caption>连击惩罚的数学（双方速度相同）</caption>
+  <thead><tr><th style="width:20%">连击数</th><th class="c" style="width:14%">惩罚</th><th class="c" style="width:22%">再次抢到行动权的概率</th><th>直觉</th></tr></thead>
+  <tbody>
+    <tr><td>第 1 次行动</td><td class="c num">0</td><td class="c num">58%</td><td>平手算你赢，所以略高于五成</td></tr>
+    <tr class="hi"><td>连续第 2 次</td><td class="c num">-1</td><td class="c num">42%</td><td>你的节奏被看穿了</td></tr>
+    <tr><td>连续第 3 次</td><td class="c num">-2</td><td class="c num">28%</td><td>再打下去就是硬撑</td></tr>
+    <tr><td>连续第 4 次</td><td class="c num">-2（封顶）</td><td class="c num">28%</td><td>不会彻底锁死，但基本交回主动权</td></tr>
+  </tbody>
+</table>
+
+<p>这条规则的三个作用：</p>
+<ul>
+  <li><b>它让"运气"变成"节奏"。</b>投出 6 只是这一下快，连续快就要付利息，翻盘窗口永远存在。</li>
+  <li><b>它给了弱者一条活路。</b>你被打到残血、连输三节拍，只要抢回一次行动权，对方的惩罚就清零了。</li>
+  <li><b>它让防守有意义。</b>防守不只减伤，还给你下次抢行动权 +2——主动"让出"这一节拍，是为了下一节拍拿回来。</li>
+</ul>
+
+<div class="box warn">
+  <div class="bt">可调项</div>
+  <p>严格按字面执行 -1（不封顶）也是合法的：把 <code>CHAIN_PENALTY_MAX</code> 改成 <code>1</code> 即可。
+  默认给到 -2 封顶，是因为实测中 -1 不封顶会让长战斗（精英 15 节拍）后半段几乎全是同一方在动，观感发闷。</p>
+</div>
+
+<h3>4.3 四种动作</h3>
+
+<table>
+  <caption>玩家在自己抢到的节拍里能做的事</caption>
+  <thead><tr><th style="width:12%">动作</th><th style="width:36%">判定</th><th>结果</th></tr></thead>
+  <tbody>
+    <tr class="hi"><td><b>攻击</b></td><td><code>1d6 + 命中修正 ≥ 敌人闪避</code></td>
+      <td>造成 <b>伤害</b> 点；骰面等于武器暴击点 → <b>双倍</b>；自然 1 → 自己受 1 点反伤</td></tr>
+    <tr><td><b>防守</b></td><td>不判定</td>
+      <td>本回合若被打中，<b>伤害 -3</b>（最低 1）；且下次抢行动权 <b>+2</b></td></tr>
+    <tr><td><b>用道具</b></td><td>—</td>
+      <td>绷带/药回血；燃烧瓶直接 6 点伤害（不需命中）；火药让下一击 +3</td></tr>
+    <tr><td><b>撤退</b></td><td><code>1d6 + 体力修正 ≥ 4</code>（精英 5）</td>
+      <td>成功：脱离战斗，体力 -2；失败：被从背后咬一口，战斗继续</td></tr>
+  </tbody>
+</table>
+
+<h3>4.4 命中、伤害、暴击</h3>
+
+<div class="formula">
+  <b>命中</b>　1d6 + 健康修正 + 武器命中 + 状态修正 − 连击惩罚 &nbsp;≥&nbsp; 敌人闪避<br><br>
+  <b>伤害</b>　角色伤害 + 武器加成 + 携带道具加成 + 临时加成　　　<i>暴击时整体 ×2</i><br><br>
+  <b>暴击</b>　骰面 = 武器暴击点　<i>（看自然骰面，不看修正——所以 -1 惩罚不会抹掉暴击，但会让你更容易打空）</i>
+</div>
+
+<p>暴击是<b>每把武器一个骰面</b>，不是"投出 6"。这带来一个很具体的手感：
+猎人拿着猎枪，每次投出 <b>4</b> 都是"砰"的一声；换成匕首，那个数字变成 <b>5</b>；
+长矛是 <b>3</b>——越早的数字，越像"一刺到底"。玩家会真的开始期待某一个点数。</p>
+
+<h3>4.5 一场精英战的完整实录</h3>
+
+<p>猎人（健康 20 · 伤害 3 · 猎枪 +3 暴击 4 · 命中 +3 · 防御 4）对骨面酋长（42 血 · 伤害 3 · 闪避 3 · 速度 +1）。</p>
+
+<div class="log">
+  <div class="lrow"><div class="lno">节拍 1</div><div class="lctx">
+    <span class="dice">你 5</span> vs <span class="dice">它 6+1=7</span> → <b>它先动</b>。
+    它 4 命中你（≥ 防御 4），<span class="dmg">健康 20 → 17</span>。</div></div>
+
+  <div class="lrow prow"><div class="lno">节拍 2</div><div class="lctx">
+    <span class="dice">你 4</span> vs <span class="dice">它 2+1-1=2</span> → <b>你行动</b>（它连击 -1 生效）。
+    你攻击 <span class="dice">3+3=6 ≥ 3</span> 命中，伤害 6：<b>酋长 42 → 36</b>。</div></div>
+
+  <div class="lrow prow"><div class="lno">节拍 3</div><div class="lctx">
+    <span class="dice">你 5-1=4</span> vs <span class="dice">它 3+1=4</span> → 平手，<b>你行动</b>（连击惩罚 -1 已经在吃了）。
+    骰面 <b>4 = 猎枪暴击点</b> → <span class="crit">双倍伤害 12</span>：<b>酋长 36 → 24</b>。</div></div>
+
+  <div class="lrow"><div class="lno">节拍 4</div><div class="lctx">
+    <span class="dice">你 3-2=1</span> vs <span class="dice">它 2+1=3</span> → <b>它行动</b>。行动权交回去，
+    <b>你的连击惩罚清零</b>。它命中，<span class="dmg">健康 17 → 14</span>。</div></div>
+
+  <div class="lrow"><div class="lno">节拍 5</div><div class="lctx">
+    <span class="dice">你 2</span> vs <span class="dice">它 5+1-1=5</span> → 它连续行动（-1 已在吃）。
+    它 <span class="dice">1+0=1</span> <b>大失败</b>，扑空。</div></div>
+
+  <div class="lrow prow"><div class="lno">节拍 6</div><div class="lctx">
+    <span class="dice">你 6</span> vs <span class="dice">它 1+1-2=-1</span> → 你行动，且自然 6 大成功。
+    命中并额外 +1 伤害：<b>酋长 24 → 17</b>。</div></div>
+
+  <div class="lrow"><div class="lno">…</div><div class="lctx dim">
+    此后它血量过半进入<b>狂暴</b>（伤害 +1、命中 +1），战斗在第 13 节拍结束——
+    你剩 5 血，从它身上抠下一块骨头（磨刀石）。</div></div>
+</div>
+
+<p>注意第 3 和第 4 节拍：<b>连击惩罚不是"惩罚强者"，是"给弱者一个回合"。</b>
+玩家连续两次行动后，第三次抢行动权的成功率掉到 28%，敌人几乎必然拿回主动权——
+这就是为什么一场 15 节拍的精英战里，双方都有十几次决策机会，而不是一方按着另一方打。</p>
+
+<h3>4.6 敌人怎么动</h3>
+
+<p>敌人行动时同样投 d6，用的是同一套公式，只是把"属性修正"换成固定值：</p>
+
+<div class="formula">
+  <b>敌人命中</b>　1d6 + 敌人命中修正 − 连击惩罚 &nbsp;≥&nbsp; 你的防御（基础 4 + 木盾 1）<br>
+  <b>敌人伤害</b>　固定值（自然 6 时 +2，狂暴时 +1）
+</div>
+
+<table>
+  <caption>敌人的三个特殊条款</caption>
+  <thead><tr><th style="width:18%">条款</th><th>效果</th></tr></thead>
+  <tbody>
+    <tr><td><b>群体</b></td><td>野人与信徒可能 1~2 只一起出现：<b>血量 ×数量，伤害 +（数量-1）</b>。围着你打，就是这么回事。</td></tr>
+    <tr><td><b>需要强光</b></td><td>未知生命体与雾中行者：没有火把/篝火时，<b>它对你的伤害翻倍</b>。火把在这里不是照明，是武器。</td></tr>
+    <tr><td><b>低语</b></td><td>信徒、祭坛看守、雾中行者：<b>每节拍精神 -1</b>，与命中无关。你可以打赢它，但会疯。</td></tr>
+  </tbody>
+</table>
+
+<h3>4.7 战斗怎么结束</h3>
+
+<table>
+  <thead><tr><th style="width:22%">结束方式</th><th>条件</th><th style="width:30%">后果</th></tr></thead>
+  <tbody>
+    <tr><td><b>敌人倒下</b></td><td>血量归零</td><td>拿到材料；精英额外掉一块磨刀石</td></tr>
+    <tr><td><b>你倒下</b></td><td>健康归零</td><td>进入<b>濒死</b>，战斗强制结束，3 回合内必须包扎</td></tr>
+    <tr><td><b>撤退</b></td><td>撤退判定成功</td><td>体力 -2，离开战斗。战斗是代价，不是内容</td></tr>
+    <tr><td><b>僵持</b></td><td>20 节拍仍未分胜负</td><td>强制脱身，体力 -2。防止无限磨</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">05</span>伤害体系</h2>
+
+<p>伤害是这一版新增的第四项属性。它存在的意义，是让"做工具"这件事第一次有了明确的数值回报——
+上一版你做出砍刀，只是换了一颗更大的骰子；现在你能直接看到自己的伤害从 3 变成 5。</p>
+
+<div class="formula">
+  <b>最终伤害 = 角色伤害（2~4） + 武器加成 + 携带道具加成 + 临时加成</b>
+</div>
+
+<h3>5.1 武器</h3>
+
+<table>
+  <caption>武器表（暴击点 = 骰面等于该数字时伤害 ×2）</caption>
+  <thead><tr><th style="width:13%">武器</th><th class="c">伤害加成</th><th class="c">暴击点</th><th class="c">命中</th><th style="width:24%">来源</th><th>备注</th></tr></thead>
+  <tbody>
+    <tr><td>空手</td><td class="c num">0</td><td class="c num">无</td><td class="c num">0</td><td>—</td><td>不会暴击</td></tr>
+    <tr><td>木棍</td><td class="c num">+1</td><td class="c num">6</td><td class="c num">0</td><td>树枝 ×2</td><td>最便宜的伤害来源</td></tr>
+    <tr><td>匕首</td><td class="c num">+2</td><td class="c num">5</td><td class="c num">0</td><td>使徒初始</td><td>短，但够快</td></tr>
+    <tr><td>砍刀</td><td class="c num">+2</td><td class="c num">4</td><td class="c num">0</td><td>燧石 ×2 + 树枝</td><td>开路的工具，也能开路</td></tr>
+    <tr><td>长矛</td><td class="c num">+3</td><td class="c num">3</td><td class="c num">0</td><td>树枝 ×2 + 燧石 + 藤蔓</td><td><b>双手</b>：不能同时用盾</td></tr>
+    <tr class="hi"><td>猎枪</td><td class="c num">+3</td><td class="c num">4</td><td class="c num">+1</td><td>猎人初始</td><td>投出 4 就是双倍</td></tr>
+    <tr><td>弓</td><td class="c num">+2</td><td class="c num">6</td><td class="c num">+1</td><td>树枝 ×2 + 藤蔓 ×2</td><td>首节拍先手</td></tr>
+  </tbody>
+</table>
+
+<div class="box brass">
+  <div class="bt">猎人的猎枪，算一遍</div>
+  <p>猎人伤害 3 + 猎枪 3 = <b>每击 6 点</b>。投出骰面 4 → <b>12 点</b>。
+  一只阶段 1 的野兽只有 9 血：正常两枪，暴击一枪。这就是"猎人"这个角色的全部说服力。</p>
+</div>
+
+<h3>5.2 增加伤害的道具</h3>
+
+<table>
+  <caption>携带即生效 / 一次性</caption>
+  <thead><tr><th style="width:16%">道具</th><th class="c" style="width:14%">效果</th><th style="width:26%">配方</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td>磨刀石</td><td class="c num">伤害 +1</td><td>燧石 + 石头</td><td>携带即生效，占一格</td></tr>
+    <tr><td>骨刺</td><td class="c num">伤害 +1</td><td>骨头 ×2</td><td>和磨刀石可叠加</td></tr>
+    <tr><td>木盾</td><td class="c num">防御 +1</td><td>树枝 ×2 + 藤蔓</td><td>与双手武器冲突</td></tr>
+    <tr><td>火药</td><td class="c num">下一击 +3</td><td>树脂 ×2 + 骨头</td><td>一次性，抹在刀刃上</td></tr>
+    <tr><td>燃烧瓶</td><td class="c num">直接 6 伤害</td><td>树脂 + 布条 + 树枝</td><td>不需命中判定，无视闪避</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3 伤害上限的推演</h3>
+
+<table>
+  <caption>不同投入下的一击伤害</caption>
+  <thead><tr><th style="width:34%">配置</th><th class="c">一击</th><th class="c">暴击</th><th class="c">对 42 血精英需要的命中次数</th></tr></thead>
+  <tbody>
+    <tr><td>使徒 · 匕首</td><td class="c num">5</td><td class="c num">10</td><td class="c num">9 / 5</td></tr>
+    <tr><td>猎人 · 猎枪</td><td class="c num">6</td><td class="c num">12</td><td class="c num">7 / 4</td></tr>
+    <tr class="hi"><td>猎人 · 猎枪 + 磨刀石 + 骨刺</td><td class="c num">8</td><td class="c num">16</td><td class="c num">6 / 3</td></tr>
+    <tr><td>脚夫 · 长矛 + 磨刀石</td><td class="c num">7</td><td class="c num">14</td><td class="c num">6 / 3</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">06</span>敌人：越深越硬</h2>
+
+<p>每个敌人有一张四阶段血量表。同一个"野兽"，在明亮树林是 9 血，走到湖畔就是 23 血——
+名字没变，但它已经不完全是同一只东西了。</p>
+
+<table>
+  <caption>普通敌人</caption>
+  <thead><tr><th style="width:18%">敌人</th><th class="c">阶段1<br><span class="dim">树林</span></th><th class="c">阶段2<br><span class="dim">河岸</span></th><th class="c">阶段3<br><span class="dim">沼泽/悬崖</span></th><th class="c">阶段4<br><span class="dim">湖畔</span></th><th class="c">伤害</th><th class="c">命中</th><th class="c">闪避</th><th class="c">速度</th><th>特性</th></tr></thead>
+  <tbody>
+    <tr><td><b>野兽</b></td><td class="c num">9</td><td class="c num">13</td><td class="c num">18</td><td class="c num">23</td><td class="c num">2</td><td class="c num">0</td><td class="c num">4</td><td class="c num">+1</td><td>快，抢行动权有优势</td></tr>
+    <tr><td><b>野人</b></td><td class="c num">11</td><td class="c num">15</td><td class="c num">20</td><td class="c num">25</td><td class="c num">3</td><td class="c num">0</td><td class="c num">3</td><td class="c num">0</td><td>1~2 只成群</td></tr>
+    <tr><td><b>信徒</b></td><td class="c num">8</td><td class="c num">11</td><td class="c num">14</td><td class="c num">17</td><td class="c num">1</td><td class="c num">0</td><td class="c num">3</td><td class="c num">0</td><td>每节拍精神 -1</td></tr>
+    <tr><td><b>未知生命体</b></td><td class="c num">13</td><td class="c num">18</td><td class="c num">23</td><td class="c num">29</td><td class="c num">2</td><td class="c num">0</td><td class="c num">4</td><td class="c num">0</td><td>无光时伤害翻倍</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <caption>精英（每阶段最多遭遇一次）</caption>
+  <thead><tr><th style="width:17%">精英</th><th class="c">出现阶段</th><th class="c">血量</th><th class="c">伤害</th><th class="c">命中</th><th class="c">闪避</th><th>特殊机制</th></tr></thead>
+  <tbody>
+    <tr><td><b>骨面酋长</b></td><td class="c num">2 起</td><td class="c num"><b>42 / 50 / 58</b></td><td class="c num">3</td><td class="c num">0</td><td class="c num">3</td><td>血量过半狂暴：伤害 +1、命中 +1</td></tr>
+    <tr><td><b>祭坛看守</b></td><td class="c num">3 起</td><td class="c num"><b>54 / 64</b></td><td class="c num">3</td><td class="c num">+2</td><td class="c num">3</td><td>命中 +2（几乎不会落空）；每节拍精神 -1</td></tr>
+    <tr class="hi"><td><b>雾中行者</b></td><td class="c num">4</td><td class="c num"><b>72</b></td><td class="c num">3</td><td class="c num">0</td><td class="c num">4</td><td>无光时伤害翻倍 → 6；每节拍精神 -1</td></tr>
+  </tbody>
+</table>
+
+<div class="box">
+  <div class="bt">为什么精英的伤害给这么低</div>
+  <p>试过伤害 4~5：单挑胜率直接掉到 15% 以下，因为玩家只有 20 血，被打中 4~5 次就死。
+  <b>精英的威胁应该体现在"血厚、拖得久、每节拍都在消耗你"，而不是"两下打死你"。</b>
+  所以血量给到 42~72，伤害压在 3，用长度换压力——15 个节拍的精英战里，玩家要做十几次决策，这比"闪避两次不然死"有意思得多。</p>
+</div>
+
+<h2><span class="no">07</span>资源经济</h2>
+
+<h3>7.1 每回合的收支</h3>
+
+<table>
+  <caption>15~25 尺度下的收支表</caption>
+  <thead><tr><th style="width:22%">项目</th><th class="c">体力</th><th class="c">精神</th><th class="c">健康</th></tr></thead>
+  <tbody>
+    <tr><td>回合自然消耗（白天）</td><td class="c num">-1</td><td class="c num">0</td><td class="c num">—</td></tr>
+    <tr><td>回合自然消耗（夜晚）</td><td class="c num">-2</td><td class="c num">-2</td><td class="c num">—</td></tr>
+    <tr><td>夜晚有篝火</td><td class="c num">-2</td><td class="c num"><b>0</b></td><td class="c num">—</td></tr>
+    <tr class="hi"><td><b>前进</b></td><td class="c num">-3</td><td class="c num">—</td><td class="c num">—</td></tr>
+    <tr><td><b>收集</b></td><td class="c num">-2</td><td class="c num">—</td><td class="c num">—</td></tr>
+    <tr class="hi"><td><b>休整</b></td><td class="c num">+6</td><td class="c num">+4</td><td class="c num">+2</td></tr>
+    <tr><td>力竭（体力 0）</td><td class="c num">—</td><td class="c num">—</td><td class="c num">-1 / 回合</td></tr>
+    <tr><td>流血 / 中毒</td><td class="c num">—</td><td class="c num">—</td><td class="c num">-1 / 回合</td></tr>
+  </tbody>
+</table>
+
+<div class="box warn">
+  <div class="bt">一条刻意的设计</div>
+  <p>休整只回 <b>2 点健康</b>，而一次战斗平均掉 3~5 点。<b>睡一觉治不了伤口</b>——
+  健康必须靠绷带（+5）、药（+7）、事件和食物。这条规则把"布条"变成了全局最紧俏的资源，
+  也让"要不要打这一仗"从数值问题变成了资源问题。</p>
+</div>
+
+<h3>7.2 状态</h3>
+
+<table>
+  <caption>状态一览</caption>
+  <thead><tr><th style="width:12%">状态</th><th style="width:26%">触发</th><th>效果</th><th style="width:22%">解除</th></tr></thead>
+  <tbody>
+    <tr><td><b>饥饿</b></td><td>体力 ≤ 6</td><td>所有判定 -1，健康回复减半</td><td>体力回到 7 以上</td></tr>
+    <tr><td><b>力竭</b></td><td>体力 = 0</td><td>判定 -2，每回合健康 -1</td><td>吃东西 / 休整</td></tr>
+    <tr><td><b>流血</b></td><td>战斗大失败、坠落</td><td>每回合健康 -1</td><td>绷带，或花一回合休整止血</td></tr>
+    <tr><td><b>中毒</b></td><td>腐败食物、沼气</td><td>每回合健康 -1，判定 -1</td><td>药；每回合 28% 自愈</td></tr>
+    <tr><td><b>心理疾病</b></td><td>精神 ≤ 6</td><td>抽一张症状：幻觉 -1 / 偏执回复减半 / 失语精神判定 -1</td><td>精神回到 7 以上</td></tr>
+    <tr class="hi"><td><b>濒死</b></td><td>健康 = 0</td><td>不能行动，3 回合倒计时</td><td>任何回血手段</td></tr>
+    <tr class="hi"><td><b>崩溃</b></td><td>精神 = 0</td><td>判定 -2，每回合健康 -1，3 回合倒计时</td><td>任何回精神手段</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">08</span>实测数据</h2>
+
+<p>所有数字来自 <code>js/_selftest.js</code>（整局机器人）与 <code>js/_duel.js</code>（单挑模拟），
+各跑 20 局 / 300 次。</p>
+
+<h3>8.1 单挑：精英到底打不打得赢</h3>
+
+<table>
+  <caption>300 次单挑，机器人策略：残血防守、有药吃药</caption>
+  <thead><tr><th style="width:42%">对局</th><th class="c">玩家胜率</th><th class="c">平均节拍</th><th class="c">平均残血</th></tr></thead>
+  <tbody>
+    <tr><td>猎人 · 猎枪 vs 阶段 1 野兽（9）</td><td class="c num">100%</td><td class="c num">4.8</td><td class="c num">17.0</td></tr>
+    <tr><td>猎人 · 猎枪 vs 阶段 1 野人（11）</td><td class="c num">97%</td><td class="c num">6.0</td><td class="c num">15.1</td></tr>
+    <tr class="hi"><td>猎人 · 猎枪 + 磨刀石 vs 骨面酋长（42）</td><td class="c num">64%</td><td class="c num">14.9</td><td class="c num">5.2</td></tr>
+    <tr><td>脚夫 · 长矛 + 磨刀石 vs 祭坛看守（54）</td><td class="c num">82%</td><td class="c num">18.5</td><td class="c num">4.5</td></tr>
+    <tr class="hi"><td>猎人 · 满配 vs 雾中行者（72）</td><td class="c num">40%</td><td class="c num">14.6</td><td class="c num">2.0</td></tr>
+  </tbody>
+</table>
+
+<p>读法：<b>普通遭遇是"必赢但会掉血"，精英是"要不要赌"。</b>
+带齐装备的猎人对最终精英是四成胜率——赢下来你会剩 2 点血，输掉就是濒死。
+这个数字就是"精英"该有的分量。</p>
+
+<h3>8.2 整局</h3>
+
+<table>
+  <caption>20 局完整流程（机器人只做"缺什么补什么"，比真人保守）</caption>
+  <thead><tr><th style="width:36%">指标</th><th class="c">结果</th><th>解读</th></tr></thead>
+  <tbody>
+    <tr><td>通关</td><td class="c num">18 / 20</td><td>机器人几乎不主动打精英，所以整体偏稳</td></tr>
+    <tr><td>平均回合</td><td class="c num">63.1</td><td>约 12 天。想更快就把阶段进度目标再压低</td></tr>
+    <tr><td>平均战斗场次</td><td class="c num">17.9</td><td>每 3.5 回合一场</td></tr>
+    <tr><td>平均战斗长度</td><td class="c num">6.5 节拍</td><td>普通怪 4~6，精英 14~18</td></tr>
+    <tr><td>精英遭遇</td><td class="c num">2.3 次 / 局</td><td>每阶段最多一次，上限 4</td></tr>
+    <tr><td>暴击</td><td class="c num">2 次 / 局</td><td>约每 6 次攻击一次，符合 1/6 设计值</td></tr>
+    <tr><td>运行时错误</td><td class="c num">0</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">09</span>调参旋钮</h2>
+
+<p>全部集中在 <code>js/data.js</code> 顶部的 <code>FT.CONFIG</code>。改完刷新页面即可。</p>
+
+<table>
+  <caption>八个真正有用的旋钮</caption>
+  <thead><tr><th style="width:26%">旋钮</th><th class="c" style="width:12%">当前值</th><th>调大之后</th></tr></thead>
+  <tbody>
+    <tr><td><code>CHAIN_PENALTY_MAX</code></td><td class="c num">2</td><td>改成 1 = 严格按 -1 不封顶，强者的连击更狠；改成 3 = 连击基本锁死</td></tr>
+    <tr><td><code>DEFEND_REDUCE</code></td><td class="c num">3</td><td>防守更强，战斗更长、更偏技巧</td></tr>
+    <tr><td><code>REST_HP</code></td><td class="c num">2</td><td>睡觉能回血，整体难度明显下降</td></tr>
+    <tr><td><code>PROGRESS_GOALS</code></td><td class="c num">[5,6,7,8]</td><td>走得更远才通关，局数变长；调小则更快</td></tr>
+    <tr><td><code>TURN_SANITY_NIGHT</code></td><td class="c num">2</td><td>精神压力更大，逼迫玩家少熬夜、多赶路</td></tr>
+    <tr><td><code>FATIGUE_EVERY</code></td><td class="c num">4</td><td>战斗僵持更耗体力，鼓励速战速决或逃跑</td></tr>
+    <tr><td>精英出现率（engine 内）</td><td class="c num">0.10</td><td>每阶段只允许一次，调这个只影响"早遇到还是晚遇到"</td></tr>
+    <tr><td><code>HUNGRY_AT</code></td><td class="c num">6</td><td>更早进入饥饿，资源压力提前</td></tr>
+  </tbody>
+</table>
+
+<div class="box brass">
+  <div class="bt">一句话总结这一版</div>
+  <p>v1 的问题是"数字很大，但没有一个数字重要"。v2 把所有东西压到 1~6 的骰面上之后，
+  每一点血、每一点伤害、每一个 -1 都变得可计算——而<b>可计算，才会被算计</b>。
+  玩家会开始为了"省一格背包放磨刀石"而吵架，这比为了 20 点血吵架要真实得多。</p>
+</div>
+
+<div class="foot">
+  <span>ForestTable · 数值与战斗设计书 v2.0</span>
+  <span>可玩原型：<code>web/index.html</code>　自测：<code>node js/_selftest.js</code></span>
+</div>
+
+</div>
+</body>
+</html>
